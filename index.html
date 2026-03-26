@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#f97316"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="CHSL Prep"/>
+<title>SSC CHSL War Room</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0f0f13;--bg2:#16161d;--bg3:#1e1e28;--bg4:#26263a;
+  --accent:#f97316;--accent2:#fb923c;--accent-dim:#f9731620;
+  --green:#22c55e;--green-dim:#22c55e18;
+  --blue:#60a5fa;--blue-dim:#60a5fa18;
+  --purple:#a78bfa;--purple-dim:#a78bfa18;
+  --red:#f87171;--red-dim:#f8717118;
+  --text:#f1f0ee;--text2:#9998a3;--text3:#54535f;
+  --border:#2a2a38;
+  --r:14px;--r2:10px;
+  --nav-h:64px;
+  --font-display:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font-body)}
+#app{height:100dvh;display:flex;flex-direction:column}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 var(--nav-h);display:none}
+.screen.active{display:block}
+.screen::-webkit-scrollbar{display:none}
+
+/* NAV */
+nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--text3);cursor:pointer;font-family:var(--font-body);font-size:10px;transition:color .2s}
+.nav-btn.active{color:var(--accent)}
+.nav-icon{font-size:20px;line-height:1}
+
+/* HEADER */
+.page-header{padding:52px 20px 20px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border)}
+.page-title{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.card+.card{margin-top:10px}
+
+/* HOME SCREEN */
+.home-hero{padding:52px 20px 0}
+.hero-greeting{font-size:13px;color:var(--text2);font-weight:300;letter-spacing:.05em;text-transform:uppercase}
+.hero-title{font-family:var(--font-display);font-size:28px;font-weight:800;line-height:1.1;margin-top:4px}
+.hero-title span{color:var(--accent)}
+.hero-day{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-top:12px}
+
+.prob-card{margin:16px 20px 0;background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:var(--r);padding:18px;overflow:hidden;position:relative}
+.prob-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:var(--accent);opacity:.06;border-radius:50%}
+.prob-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em}
+.prob-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:6px}
+.prob-pct{font-family:var(--font-display);font-size:44px;font-weight:800;color:var(--accent);line-height:1}
+.prob-status{text-align:right}
+.prob-level{font-size:13px;font-weight:600;color:var(--text)}
+.prob-next{font-size:11px;color:var(--text2);margin-top:2px}
+.prob-bar-wrap{margin-top:14px}
+.prob-bar-bg{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.prob-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.prob-milestones{display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:5px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 20px 0}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 12px}
+.stat-val{font-family:var(--font-display);font-size:22px;font-weight:700}
+.stat-val.orange{color:var(--accent)}
+.stat-val.green{color:var(--green)}
+.stat-val.blue{color:var(--blue)}
+.stat-label{font-size:11px;color:var(--text2);margin-top:2px}
+
+.section{padding:16px 20px 0}
+.section-title{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.section-link{font-size:12px;color:var(--accent);font-weight:400;font-family:var(--font-body)}
+
+.task-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.task-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.task-item:last-child{border-bottom:none}
+.task-item:active{background:var(--bg3)}
+.task-item.done{opacity:.55}
+.task-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.task-item.done .task-check{background:var(--green);border-color:var(--green);color:#fff}
+.task-info{flex:1}
+.task-name{font-size:14px;font-weight:500}
+.task-item.done .task-name{text-decoration:line-through;color:var(--text2)}
+.task-meta{font-size:11px;color:var(--text2);margin-top:2px}
+.task-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;flex-shrink:0}
+.tb-q{background:var(--blue-dim);color:var(--blue)}
+.tb-e{background:var(--green-dim);color:var(--green)}
+.tb-r{background:var(--purple-dim);color:var(--purple)}
+.tb-g{background:var(--red-dim);color:var(--red)}
+
+.streak-row{display:flex;gap:5px;margin-top:8px}
+.streak-dot{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3)}
+.streak-dot.on{background:var(--green-dim);border-color:var(--green);color:var(--green);font-size:14px}
+.streak-dot.today{border-color:var(--accent);color:var(--accent)}
+
+/* LEARN SCREEN */
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 20px}
+.topic-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;overflow:hidden}
+.topic-card:active{transform:scale(.97)}
+.topic-card.active-border{border-color:var(--accent)}
+.topic-icon{font-size:24px;margin-bottom:8px}
+.topic-name{font-size:13px;font-weight:600;font-family:var(--font-display)}
+.topic-count{font-size:11px;color:var(--text2);margin-top:2px}
+.topic-prog{height:3px;background:var(--bg4);border-radius:2px;margin-top:10px;overflow:hidden}
+.topic-prog-fill{height:100%;border-radius:2px;transition:width .8s ease}
+
+.lesson-view{display:none;padding:0 20px 20px}
+.lesson-view.visible{display:block}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text2);font-size:14px;font-family:var(--font-body);cursor:pointer;padding:16px 0 10px;width:100%}
+.lesson-title{font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:16px}
+.concept-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.concept-title{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.concept-text{font-size:14px;line-height:1.7;color:var(--text2)}
+.concept-text strong{color:var(--text);font-weight:500}
+.trick-block{background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.trick-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.trick-text{font-size:14px;line-height:1.7}
+.example-block{background:var(--bg3);border-radius:var(--r2);padding:14px;margin:8px 0;font-family:monospace;font-size:13px;line-height:1.8;color:var(--text)}
+.highlight{color:var(--accent);font-weight:700}
+.table-wrap{overflow-x:auto;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--bg3);padding:8px 10px;text-align:left;font-weight:600;color:var(--text2);font-family:var(--font-body)}
+td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.quiz-btn{width:100%;padding:14px;background:var(--accent);color:#fff;font-family:var(--font-display);font-size:15px;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-top:14px;transition:opacity .15s}
+.quiz-btn:active{opacity:.85}
+
+/* PRACTICE SCREEN */
+.practice-header{padding:52px 20px 16px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border)}
+.prac-title{font-family:var(--font-display);font-size:22px;font-weight:700}
+.filter-row{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.q-card{margin:14px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.q-header{padding:14px 16px 0;display:flex;justify-content:space-between;align-items:center}
+.q-num{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.q-diff{font-size:10px;padding:2px 8px;border-radius:10px}
+.diff-easy{background:var(--green-dim);color:var(--green)}
+.diff-med{background:var(--accent-dim);color:var(--accent)}
+.diff-hard{background:var(--red-dim);color:var(--red)}
+.q-text{padding:14px 16px;font-size:15px;line-height:1.6;font-weight:500}
+.q-options{padding:0 16px 16px;display:grid;gap:8px}
+.q-opt{padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r2);font-size:14px;cursor:pointer;transition:all .2s;background:var(--bg3);color:var(--text)}
+.q-opt:active{transform:scale(.98)}
+.q-opt.selected{border-color:var(--blue);background:var(--blue-dim);color:var(--blue)}
+.q-opt.correct{border-color:var(--green);background:var(--green-dim);color:var(--green);font-weight:600}
+.q-opt.wrong{border-color:var(--red);background:var(--red-dim);color:var(--red)}
+.q-explanation{margin:0 16px 16px;padding:12px;background:var(--bg3);border-radius:var(--r2);display:none;font-size:13px;line-height:1.6;color:var(--text2);border-left:3px solid var(--green)}
+.q-explanation.visible{display:block}
+.q-explanation strong{color:var(--text)}
+.q-nav{padding:0 16px 16px;display:flex;gap:8px}
+.q-nav-btn{flex:1;padding:12px;border-radius:var(--r2);border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
+.q-nav-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.q-nav-btn:active{opacity:.85}
+
+/* PROGRESS SCREEN */
+.prog-header{padding:52px 20px 16px;border-bottom:1px solid var(--border)}
+.prog-title{font-family:var(--font-display);font-size:22px;font-weight:700}
+.roadmap-card{margin:14px 20px 0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.month-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.month-item:last-child{border-bottom:none}
+.month-item:active{background:var(--bg3)}
+.month-item.current{background:var(--accent-dim)}
+.month-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:0}
+.month-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text3);flex-shrink:0}
+.month-dot.active-dot{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.month-dot.done-dot{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.month-line{width:2px;height:20px;background:var(--border)}
+.month-info{flex:1;padding-top:4px}
+.month-name{font-size:14px;font-weight:600;font-family:var(--font-display)}
+.month-sub{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
+.month-tag{font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;display:inline-block;font-weight:600}
+.mt-current{background:var(--accent-dim);color:var(--accent)}
+.mt-upcoming{background:var(--bg3);color:var(--text3)}
+.mt-done{background:var(--green-dim);color:var(--green)}
+
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 20px 0}
+.subj-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.subj-name{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.subj-score{font-family:var(--font-display);font-size:26px;font-weight:800}
+.subj-bar-wrap{margin-top:8px}
+.subj-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.subj-fill{height:100%;border-radius:2px}
+
+.tip-card{margin:14px 20px 0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.tip-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.tip-text{font-size:14px;line-height:1.6}
+.tip-text strong{color:var(--accent)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:8px 20px 32px;transform:translateY(40px);transition:transform .3s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 16px}
+.modal-title{font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:14px}
+.modal-close{float:right;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;margin-top:-4px}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:10px 20px;font-size:13px;font-weight:500;z-index:300;transition:transform .3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* UTILITY */
+.padded{padding:0 20px}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+.badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.badge{font-size:10px;padding:3px 9px;border-radius:10px;font-weight:600}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="screen-home">
+  <div class="home-hero">
+    <div class="hero-greeting">Mission Control</div>
+    <div class="hero-title">SSC CHSL<br><span>War Room</span></div>
+    <div class="hero-day" id="hero-day-badge">📅 Day 1 of 180</div>
+  </div>
+
+  <div class="prob-card">
+    <div class="prob-label">Selection Probability Meter</div>
+    <div class="prob-row">
+      <div class="prob-pct" id="home-prob">12%</div>
+      <div class="prob-status">
+        <div class="prob-level">Beginner</div>
+        <div class="prob-next">Next: Intermediate at 40%</div>
+      </div>
+    </div>
+    <div class="prob-bar-wrap">
+      <div class="prob-bar-bg"><div class="prob-bar-fill" id="prob-fill" style="width:12%"></div></div>
+      <div class="prob-milestones"><span>0</span><span>Intermediate</span><span>Advanced</span><span>Ready</span></div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val orange" id="stat-streak">0</div>
+      <div class="stat-label">Day Streak 🔥</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val green" id="stat-qs">0</div>
+      <div class="stat-label">Qs Solved</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val blue" id="stat-acc">—</div>
+      <div class="stat-label">Accuracy</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Today's Battle Plan <span class="section-link" onclick="showTab('practice')">Practice →</span></div>
+    <div class="task-card" id="task-list"></div>
+    <div class="card mt8" style="padding:12px 14px">
+      <div class="section-title" style="font-size:13px;margin-bottom:6px">7-Day Streak</div>
+      <div class="streak-row" id="streak-row"></div>
+    </div>
+  </div>
+
+  <div class="section mt16" style="padding-bottom:20px">
+    <div class="section-title">Exam at a Glance</div>
+    <div class="card">
+      <table style="width:100%;font-size:13px;border-collapse:collapse">
+        <tr><td style="padding:6px 0;color:var(--text2)">Total Questions</td><td style="text-align:right;font-weight:600;color:var(--text)">100</td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);border-top:1px solid var(--border)">Total Marks</td><td style="text-align:right;font-weight:600;color:var(--text);border-top:1px solid var(--border)">200</td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);border-top:1px solid var(--border)">Time Limit</td><td style="text-align:right;font-weight:600;color:var(--accent);border-top:1px solid var(--border)">60 min</td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);border-top:1px solid var(--border)">Negative Marking</td><td style="text-align:right;font-weight:600;color:var(--red);border-top:1px solid var(--border)">−0.5</td></tr>
+        <tr><td style="padding:6px 0;color:var(--text2);border-top:1px solid var(--border)">Sections</td><td style="text-align:right;font-weight:600;color:var(--text);border-top:1px solid var(--border)">4 × 25 Qs</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- LEARN SCREEN -->
+<div class="screen" id="screen-learn">
+  <div class="page-header">
+    <div class="page-title">Lessons</div>
+    <div class="page-sub">Tap a subject to begin</div>
+  </div>
+  <div class="topic-grid" id="topic-grid"></div>
+  <div class="lesson-view" id="lesson-view">
+    <button class="back-btn" onclick="closeLessonView()">← Back to Lessons</button>
+    <div id="lesson-content"></div>
+  </div>
+</div>
+
+<!-- PRACTICE SCREEN -->
+<div class="screen" id="screen-practice">
+  <div class="practice-header">
+    <div class="prac-title">Practice</div>
+    <div class="filter-row" id="filter-row"></div>
+  </div>
+  <div id="practice-area"></div>
+</div>
+
+<!-- PROGRESS SCREEN -->
+<div class="screen" id="screen-progress">
+  <div class="prog-header">
+    <div class="prog-title">Your Progress</div>
+  </div>
+  <div class="subj-grid" id="subj-grid"></div>
+  <div style="padding:14px 20px 0"><div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:10px">6-Month Roadmap</div></div>
+  <div class="roadmap-card" id="roadmap-list"></div>
+  <div class="tip-card" id="mentor-tip">
+    <div class="tip-label">Mentor's Tip</div>
+    <div class="tip-text" id="tip-text-content"></div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+
+</div><!-- /app -->
+
+<!-- NAV -->
+<nav>
+  <button class="nav-btn active" onclick="showTab('home')" id="nav-home">
+    <span class="nav-icon">🏠</span><span>Home</span>
+  </button>
+  <button class="nav-btn" onclick="showTab('learn')" id="nav-learn">
+    <span class="nav-icon">📚</span><span>Learn</span>
+  </button>
+  <button class="nav-btn" onclick="showTab('practice')" id="nav-practice">
+    <span class="nav-icon">⚡</span><span>Practice</span>
+  </button>
+  <button class="nav-btn" onclick="showTab('progress')" id="nav-progress">
+    <span class="nav-icon">📊</span><span>Progress</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ DATA STORE ═══
+const S = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+let state = {
+  day: S.get('day',1),
+  streak: S.get('streak',0),
+  lastStudy: S.get('lastStudy',null),
+  tasks: S.get('tasks',[false,false,false,false,false]),
+  qsSolved: S.get('qsSolved',0),
+  correct: S.get('correct',0),
+  subjectProgress: S.get('subjectProgress',{quant:8,english:15,reasoning:18,gk:10}),
+  probability: S.get('probability',12),
+  lessonProgress: S.get('lessonProgress',{}),
+  streakDays: S.get('streakDays',[])
+};
+
+function save(){
+  ['day','streak','lastStudy','tasks','qsSolved','correct','subjectProgress','probability','lessonProgress','streakDays']
+    .forEach(k=>S.set(k,state[k]));
+}
+
+// ═══ LESSONS DATA ═══
+const LESSONS = {
+  quant: {
+    icon:'🔢', name:'Quantitative Aptitude', color:'#60a5fa', topics:[
+      {id:'numsys', name:'Number System', done:false},
+      {id:'percent', name:'Percentages', done:false},
+      {id:'ratio', name:'Ratio & Proportion', done:false},
+      {id:'profit', name:'Profit & Loss', done:false},
+      {id:'time', name:'Time & Work', done:false},
+    ],
+    content: {
+      numsys: {
+        title:'Number System',
+        sections:[
+          {type:'concept', title:'Types of Numbers', body:`<strong>Natural Numbers:</strong> 1, 2, 3, 4 ... (counting numbers — starts at 1, no fractions)<br><br><strong>Whole Numbers:</strong> 0, 1, 2, 3 ... (natural + zero)<br><br><strong>Integers:</strong> ...-3, -2, -1, 0, 1, 2, 3... (positive + negative + zero)<br><br><strong>Rational:</strong> Can be written as p/q where q≠0. Example: 3/4, -2/5, 7<br><br><strong>Irrational:</strong> Cannot be written as p/q. Example: √2, π, √3`},
+          {type:'trick', title:'⚡ Exam Shortcut — Divisibility Rules', body:`These come in <strong>every SSC exam</strong>. Memorise these cold:<br><br><strong>÷2:</strong> Last digit even (0,2,4,6,8)<br><strong>÷3:</strong> Sum of digits ÷ 3<br><strong>÷4:</strong> Last 2 digits ÷ 4<br><strong>÷5:</strong> Ends in 0 or 5<br><strong>÷6:</strong> Divisible by both 2 and 3<br><strong>÷8:</strong> Last 3 digits ÷ 8<br><strong>÷9:</strong> Sum of digits ÷ 9<br><strong>÷11:</strong> (Sum of odd-position digits) − (Sum of even-position digits) = 0 or 11`},
+          {type:'example', body:`Is 726 divisible by 11?
+Odd positions: 7 + 6 = 13
+Even positions: 2
+Difference: 13 − 2 = 11 ✓  →  YES, divisible by 11`},
+          {type:'concept', title:'LCM & HCF — The Most Asked Topic', body:`<strong>HCF (GCD):</strong> Largest number that divides all given numbers<br><strong>LCM:</strong> Smallest number divisible by all given numbers<br><br><strong>Golden Formula:</strong> HCF × LCM = Product of two numbers<br><br><strong>When to use HCF:</strong> "Maximum tiles", "Largest container", "Divide equally"<br><strong>When to use LCM:</strong> "Minimum distance", "Meet again", "Repeat after"`},
+          {type:'trick', title:'⚡ HCF/LCM Speed Method', body:`<strong>HCF of 36 and 48:</strong><br>36 = 2² × 3²<br>48 = 2⁴ × 3<br>HCF = 2² × 3¹ = 12 (take lowest powers)<br><br><strong>LCM of 36 and 48:</strong><br>LCM = 2⁴ × 3² = 144 (take highest powers)<br><br><strong>Verify:</strong> 12 × 144 = 1728 = 36 × 48 ✓`},
+          {type:'concept', title:'Prime Numbers — Quick Identification', body:`A number with exactly 2 factors: 1 and itself.<br><br><strong>Primes up to 50:</strong> 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47<br><br><strong>Quick test for primality:</strong> Check divisibility by all primes up to √N<br>Example: Is 97 prime? √97 ≈ 9.8. Check 2,3,5,7 — none divide 97 → PRIME`},
+        ]
+      },
+      percent: {
+        title:'Percentages',
+        sections:[
+          {type:'concept', title:'What is Percentage?', body:`Percentage means "per hundred". x% = x/100<br><br><strong>Key conversions to memorise:</strong><br>1/2 = 50%, 1/3 = 33.33%, 1/4 = 25%, 1/5 = 20%<br>1/6 = 16.67%, 1/7 = 14.28%, 1/8 = 12.5%, 1/9 = 11.11%, 1/10 = 10%`},
+          {type:'trick', title:'⚡ Percentage Change Shortcut', body:`<strong>% change = (Change / Original) × 100</strong><br><br>If price increases by 20% then decreases by 20%:<br>Net effect = −(20²/100) = −4% (always a LOSS)<br><br><strong>Rule:</strong> Equal +x% and −x% always results in −x²/100 %`},
+          {type:'example', body:`Price was ₹500. Increased 20%, then decreased 20%.
+Method 1 (slow): 500×1.2 = 600, then 600×0.8 = 480
+Method 2 (fast): 500 × (1 - 400/10000) = 500 × 0.96 = ₹480
+Net loss = 4% of 500 = ₹20  ✓ Same answer, faster!`},
+        ]
+      }
+    }
+  },
+  english: {
+    icon:'📖', name:'English Language', color:'#22c55e', topics:[
+      {id:'parts', name:'Parts of Speech', done:false},
+      {id:'tenses', name:'Tenses', done:false},
+      {id:'vocab', name:'Vocabulary', done:false},
+      {id:'rc', name:'Reading Comprehension', done:false},
+      {id:'error', name:'Error Detection', done:false},
+    ],
+    content:{
+      parts:{
+        title:'Parts of Speech',
+        sections:[
+          {type:'concept', title:'The 8 Parts of Speech', body:`<strong>1. Noun:</strong> Name of person/place/thing — Ram, Delhi, Table<br><strong>2. Pronoun:</strong> Replaces noun — He, She, They, It<br><strong>3. Verb:</strong> Action/state — Run, Is, Have, Eat<br><strong>4. Adjective:</strong> Describes noun — Big, Beautiful, Three<br><strong>5. Adverb:</strong> Describes verb/adjective — Quickly, Very, Often<br><strong>6. Preposition:</strong> Shows relation — In, On, At, Between<br><strong>7. Conjunction:</strong> Joins words — And, But, Or, Because<br><strong>8. Interjection:</strong> Exclamation — Oh!, Wow!, Alas!`},
+          {type:'trick', title:'⚡ Noun vs Verb Quick Trick', body:`Add "-ing" — if it makes sense as an action, it's a verb base.<br><br>"Run" → Running (action) = VERB<br>"Beauty" → Beautying ✗ = NOUN<br><br><strong>SSC loves asking:</strong> Find the part of speech of the underlined word. Always check the FUNCTION in the sentence, not just the word itself.<br><br>"Light" can be Noun (the light), Verb (light the lamp), Adjective (light colour), Adverb (travel light)`},
+          {type:'concept', title:'Subject-Verb Agreement — Most Tested', body:`<strong>Rule 1:</strong> Singular subject → singular verb. "He <strong>goes</strong>" not "He go"<br><strong>Rule 2:</strong> Two subjects joined by "and" → plural verb<br><strong>Rule 3:</strong> Either/Neither/Each/Every → singular verb<br><br><strong>Tricky rule:</strong> "The news <strong>is</strong> good" (news looks plural but is singular)<br>Also: Mathematics, Physics, Economics → always singular`},
+        ]
+      },
+      tenses:{
+        title:'Tenses',
+        sections:[
+          {type:'concept', title:'Tense Formula Chart', body:`<strong>Simple:</strong><br>Present: V1/V1+s — "She walks"<br>Past: V2 — "She walked"<br>Future: will+V1 — "She will walk"<br><br><strong>Continuous:</strong><br>Present: is/am/are + V-ing<br>Past: was/were + V-ing<br>Future: will be + V-ing<br><br><strong>Perfect:</strong><br>Present: has/have + V3<br>Past: had + V3<br>Future: will have + V3`},
+          {type:'trick', title:'⚡ Since vs For Rule', body:`<strong>Since</strong> = Point of time → Since 2020, Since Monday<br><strong>For</strong> = Period of time → For 3 years, For two hours<br><br>Use with Perfect tenses: "I have lived here <strong>for</strong> 5 years"<br>"I have lived here <strong>since</strong> 2019"`},
+        ]
+      }
+    }
+  },
+  reasoning: {
+    icon:'🧩', name:'General Intelligence', color:'#a78bfa', topics:[
+      {id:'series', name:'Number Series', done:false},
+      {id:'analogy', name:'Analogy', done:false},
+      {id:'coding', name:'Coding-Decoding', done:false},
+      {id:'puzzle', name:'Puzzles & Seating', done:false},
+      {id:'matrix', name:'Matrix / Pattern', done:false},
+    ],
+    content:{
+      series:{
+        title:'Number Series',
+        sections:[
+          {type:'concept', title:'Types of Series', body:`<strong>Arithmetic (AP):</strong> Constant difference — 2, 5, 8, 11... (diff = +3)<br><strong>Geometric (GP):</strong> Constant ratio — 3, 6, 12, 24... (ratio = ×2)<br><strong>Prime series:</strong> 2, 3, 5, 7, 11, 13...<br><strong>Square series:</strong> 1, 4, 9, 16, 25...<br><strong>Cube series:</strong> 1, 8, 27, 64, 125...<br><strong>Mixed:</strong> Alternate terms follow different rules`},
+          {type:'trick', title:'⚡ 3-Step Attack Method', body:`<strong>Step 1:</strong> Check differences (subtract consecutive terms)<br><strong>Step 2:</strong> If differences aren't constant, check differences OF differences<br><strong>Step 3:</strong> If still unclear, check ratios<br><br><strong>Example:</strong> 1, 4, 9, 16, ?<br>Diff: 3, 5, 7... (odd numbers) → next diff = 9 → Answer = 25 (= 5²)`},
+          {type:'example', body:`Q: 2, 6, 12, 20, 30, ?
+Differences: 4, 6, 8, 10... (increasing by 2)
+Next difference = 12
+Answer = 30 + 12 = 42
+
+Verification: n(n+1) → 1×2, 2×3, 3×4, 4×5, 5×6, 6×7 = 42 ✓`},
+        ]
+      },
+      analogy:{
+        title:'Analogy',
+        sections:[
+          {type:'concept', title:'Types of Analogy', body:`<strong>Word Analogy:</strong> Dog : Kennel :: Bird : ?<br>(Dog lives in Kennel, Bird lives in Nest)<br><br><strong>Number Analogy:</strong> 4 : 16 :: 5 : ?<br>(4² = 16, 5² = 25)<br><br><strong>Letter Analogy:</strong> AB : CD :: EF : ?<br>(Consecutive pairs → GH)<br><br><strong>Key:</strong> Always identify the EXACT relationship first, then apply it.`},
+        ]
+      }
+    }
+  },
+  gk: {
+    icon:'🌍', name:'General Awareness', color:'#f87171', topics:[
+      {id:'india', name:'India — States & Geography', done:false},
+      {id:'history', name:'Modern History', done:false},
+      {id:'polity', name:'Indian Polity', done:false},
+      {id:'science', name:'Science (Basic)', done:false},
+      {id:'current', name:'Current Affairs', done:false},
+    ],
+    content:{
+      india:{
+        title:'India — States & Geography',
+        sections:[
+          {type:'concept', title:'India at a Glance', body:`<strong>Capital:</strong> New Delhi<br><strong>States:</strong> 28 states, 8 Union Territories<br><strong>Largest State (area):</strong> Rajasthan<br><strong>Smallest State (area):</strong> Goa<br><strong>Most Populated:</strong> Uttar Pradesh<br><strong>River by Length:</strong> Ganga (longest in India), Indus (total length)<br><strong>Highest Peak:</strong> K2 (in India-controlled territory), Kanchenjunga (in India proper)`},
+          {type:'trick', title:'⚡ States & Capitals Memory Trick', body:`<strong>North:</strong> J&K→Srinagar/Jammu, HP→Shimla, Punjab→Chandigarh, Haryana→Chandigarh, Delhi→New Delhi, Uttarakhand→Dehradun<br><br><strong>East:</strong> UP→Lucknow, Bihar→Patna, WB→Kolkata, Jharkhand→Ranchi, Odisha→Bhubaneswar<br><br><strong>South:</strong> AP→Amaravati, Telangana→Hyderabad, Karnataka→Bengaluru, Tamil Nadu→Chennai, Kerala→Thiruvananthapuram, Goa→Panaji<br><br><strong>West:</strong> Maharashtra→Mumbai, Gujarat→Gandhinagar, Rajasthan→Jaipur, MP→Bhopal`},
+        ]
+      },
+      polity:{
+        title:'Indian Polity',
+        sections:[
+          {type:'concept', title:'Constitution Basics', body:`<strong>Adopted:</strong> 26 Nov 1949 | <strong>Enforced:</strong> 26 Jan 1950<br><strong>Drafting Committee Chairman:</strong> Dr. B.R. Ambedkar<br><strong>Preamble describes India as:</strong> Sovereign Socialist Secular Democratic Republic<br><br><strong>Parliament:</strong><br>Lok Sabha (Lower House) — max 552 members<br>Rajya Sabha (Upper House) — max 250 members<br><br><strong>Key Articles:</strong><br>Art 12-35: Fundamental Rights<br>Art 36-51: Directive Principles<br>Art 51A: Fundamental Duties`},
+        ]
+      }
+    }
+  }
+};
+
+// ═══ QUESTIONS DATA ═══
+const QUESTIONS = [
+  {id:1,subject:'quant',diff:'easy',q:'What is the LCM of 12 and 18?',opts:['24','36','48','72'],ans:1,exp:'12=2²×3, 18=2×3². LCM = 2²×3² = 4×9 = 36. Always take highest powers.'},
+  {id:2,subject:'quant',diff:'easy',q:'A number is divisible by 9. Which of these could it be?',opts:['342','344','346','348'],ans:0,exp:'Sum of digits of 342 = 3+4+2 = 9. Divisible by 9. Always check sum of digits for divisibility by 3 and 9.'},
+  {id:3,subject:'quant',diff:'medium',q:'If a price increases by 25% then decreases by 25%, the net change is:',opts:['No change','-6.25%','+6.25%','-3.75%'],ans:1,exp:'Net % = −(x²/100) = −(25²/100) = −6.25%. Equal increase and decrease always gives a net loss.'},
+  {id:4,subject:'quant',diff:'medium',q:'The HCF of 36, 48 and 60 is:',opts:['6','12','18','24'],ans:1,exp:'36=2²×3², 48=2⁴×3, 60=2²×3×5. HCF = 2²×3 = 12. Take lowest powers of common factors.'},
+  {id:5,subject:'english',diff:'easy',q:'Choose the correct sentence:',opts:['She don\'t know','She doesn\'t know','She didn\'t knows','She not knows'],ans:1,exp:'Third person singular (She/He/It) uses "doesn\'t" for present negative. "don\'t" is for I/You/We/They.'},
+  {id:6,subject:'english',diff:'easy',q:'I have been living here __ 2019.',opts:['for','since','from','during'],ans:1,exp:'"Since" is used with a point of time (2019, Monday, morning). "For" is used with a period of time (5 years, two hours).'},
+  {id:7,subject:'english',diff:'medium',q:'The news __ good today. (Choose correct verb)',opts:['are','were','is','have been'],ans:2,exp:'"News" is uncountable and always singular. Always takes singular verb: is/was/has. Common SSC trap!'},
+  {id:8,subject:'reasoning',diff:'easy',q:'Find the next number: 2, 5, 10, 17, 26, ?',opts:['35','37','38','36'],ans:1,exp:'Differences: 3,5,7,9,11... (odd numbers increasing). Next diff = 11. 26+11 = 37. Classic SSC series pattern.'},
+  {id:9,subject:'reasoning',diff:'easy',q:'Dog : Kennel :: Bird : ?',opts:['Cage','Nest','Den','Stable'],ans:1,exp:'A Dog lives in a Kennel (natural home). A Bird lives in a Nest (natural home). Cage is man-made. The relationship is "animal : natural dwelling".'},
+  {id:10,subject:'reasoning',diff:'medium',q:'BCDE : EFGH :: PQRS : ?',opts:['TUVW','STUV','UVWX','VWXY'],ans:0,exp:'B=2,C=3,D=4,E=5 → shifted to E=5,F=6,G=7,H=8 (+3 positions). Similarly PQRS(16-19) +4 positions = TUVW(20-23).'},
+  {id:11,subject:'gk',diff:'easy',q:'Which is the largest state in India by area?',opts:['Madhya Pradesh','Maharashtra','Rajasthan','Uttar Pradesh'],ans:2,exp:'Rajasthan is the largest state in India by area at 342,239 km². MP was largest before Chhattisgarh was carved out in 2000.'},
+  {id:12,subject:'gk',diff:'easy',q:'The Indian Constitution was adopted on:',opts:['26 January 1950','15 August 1947','26 November 1949','2 October 1948'],ans:2,exp:'Adopted on 26 November 1949 (Constitution Day). It came into effect on 26 January 1950 (Republic Day). SSC frequently asks this distinction.'},
+  {id:13,subject:'quant',diff:'hard',q:'If 15% of x equals 20% of y, then x:y is:',opts:['3:4','4:3','15:20','2:3'],ans:1,exp:'15x/100 = 20y/100 → 15x = 20y → x/y = 20/15 = 4/3. So x:y = 4:3.'},
+  {id:14,subject:'english',diff:'hard',q:'Select the word that is CLOSEST in meaning to "Ebullient":',opts:['Gloomy','Enthusiastic','Lazy','Confused'],ans:1,exp:'"Ebullient" means cheerful and full of energy/enthusiasm. Root: "ebullire" (to bubble up). Antonym: morose, gloomy.'},
+  {id:15,subject:'reasoning',diff:'hard',q:'In a code language, MANGO is written as NBOIP. How is APPLE written?',opts:['BQQMF','BQPMF','BQQPF','BQQLF'],ans:0,exp:'Each letter is shifted +1: M+1=N, A+1=B, N+1=O, G+1=H... wait: M→N(+1), A→B(+1), N→O(+1), G→H? No: NBOIP. M→N, A→B, N→O, G→H, O→P. So A→B, P→Q, P→Q, L→M, E→F = BQQMF.'},
+];
+
+// ═══ DAILY TASKS ═══
+const DAILY_TASKS = [
+  {name:'Quant: Number System Concepts', meta:'45 min · Read lesson first', badge:'tb-q', badgeText:'QUANT'},
+  {name:'English: Parts of Speech', meta:'40 min · Grammar foundation', badge:'tb-e', badgeText:'ENG'},
+  {name:'Reasoning: Number Series', meta:'35 min · Pattern recognition', badge:'tb-r', badgeText:'REASON'},
+  {name:'GK: India States & Capitals', meta:'20 min · Memorise with tricks', badge:'tb-g', badgeText:'GK'},
+  {name:'Practice: 5 questions per subject', meta:'40 min · Check explanations', badge:'tb-q', badgeText:'DRILL'},
+];
+
+// ═══ ROADMAP ═══
+const ROADMAP = [
+  {m:'Month 1', name:'Foundation', desc:'Number System · Percentages · Parts of Speech · Series · India GK', status:'current'},
+  {m:'Month 2', name:'Speed Building', desc:'Ratio · Algebra · Tenses · Analogy · History', status:'upcoming'},
+  {m:'Month 3', name:'High-Weightage', desc:'Geometry · DI · Reading Comprehension · Coding-Decoding', status:'upcoming'},
+  {m:'Month 4', name:'Advanced Solving', desc:'Profit/Loss · Trigonometry · Error Detection · Static GK', status:'upcoming'},
+  {m:'Month 5', name:'Mock Battle Training', desc:'Full Mocks · PYQ Revision · Weak Area Attack', status:'upcoming'},
+  {m:'Month 6', name:'Final Sprint', desc:'Daily Mocks · Revision · Exam Temperament', status:'upcoming'},
+];
+
+const TIPS = [
+  'In SSC CHSL, <strong>Reasoning and English are the highest ROI subjects</strong>. Master them first.',
+  '<strong>Never leave a Reasoning question unattempted</strong> — it has no calculation, only logic. 2 min per question.',
+  '<strong>Divisibility rules save 30 seconds per question</strong> in quant. That\'s 10+ minutes saved per exam.',
+  'English vocabulary: learn <strong>10 new words daily</strong>. After 180 days = 1800 words — more than enough.',
+  '<strong>GK is pure memorisation</strong>. 20 minutes daily with spaced repetition beats 3-hour cramming sessions.',
+];
+
+// ═══ RENDER FUNCTIONS ═══
+function renderHome(){
+  // Update day badge
+  document.getElementById('hero-day-badge').textContent = `📅 Day ${state.day} of 180`;
+
+  // Probability
+  document.getElementById('home-prob').textContent = state.probability + '%';
+  document.getElementById('prob-fill').style.width = state.probability + '%';
+
+  // Stats
+  document.getElementById('stat-streak').textContent = state.streak;
+  document.getElementById('stat-qs').textContent = state.qsSolved;
+  document.getElementById('stat-acc').textContent = state.qsSolved > 0
+    ? Math.round((state.correct/state.qsSolved)*100) + '%' : '—';
+
+  // Tasks
+  const tl = document.getElementById('task-list');
+  tl.innerHTML = DAILY_TASKS.map((t,i) => `
+    <div class="task-item ${state.tasks[i]?'done':''}" onclick="toggleTask(${i})">
+      <div class="task-check">${state.tasks[i]?'✓':''}</div>
+      <div class="task-info">
+        <div class="task-name">${t.name}</div>
+        <div class="task-meta">${t.meta}</div>
+      </div>
+      <span class="task-badge ${t.badge}">${t.badgeText}</span>
+    </div>
+  `).join('');
+
+  // Streak dots
+  const sr = document.getElementById('streak-row');
+  const days = ['M','T','W','T','F','S','S'];
+  const today = new Date().getDay();
+  sr.innerHTML = days.map((d,i) => {
+    const isToday = i === (today===0?6:today-1);
+    const wasStudied = state.streakDays.includes(i);
+    return `<div class="streak-dot ${wasStudied?'on':''} ${isToday&&!wasStudied?'today':''}">${wasStudied?'✓':d}</div>`;
+  }).join('');
+}
+
+function toggleTask(i){
+  state.tasks[i] = !state.tasks[i];
+  const done = state.tasks.filter(Boolean).length;
+
+  // Update streak and probability
+  if(done === DAILY_TASKS.length && !state.tasksCompletedToday){
+    state.tasksCompletedToday = true;
+    state.streak += 1;
+    state.probability = Math.min(85, state.probability + 2);
+    const today = new Date().getDay();
+    const dayIdx = today===0?6:today-1;
+    if(!state.streakDays.includes(dayIdx)) state.streakDays.push(dayIdx);
+    save();
+    showToast('🔥 All tasks done! Streak +1');
+  }
+  save();
+  renderHome();
+}
+
+function renderLearn(){
+  const tg = document.getElementById('topic-grid');
+  tg.innerHTML = Object.entries(LESSONS).map(([key,sub]) => {
+    const completed = Object.values(state.lessonProgress).filter(v=>v===key).length;
+    const total = sub.topics.length;
+    const pct = Math.round((completed/total)*100);
+    return `
+      <div class="topic-card" onclick="openSubject('${key}')">
+        <div class="topic-icon">${sub.icon}</div>
+        <div class="topic-name">${sub.name}</div>
+        <div class="topic-count">${completed}/${total} topics</div>
+        <div class="topic-prog"><div class="topic-prog-fill" style="width:${pct}%;background:${sub.color}"></div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+let currentSubject = null;
+let currentTopicId = null;
+
+function openSubject(key){
+  currentSubject = key;
+  const sub = LESSONS[key];
+  document.getElementById('topic-grid').style.display = 'none';
+  document.getElementById('lesson-view').classList.add('visible');
+
+  const content = document.getElementById('lesson-content');
+  content.innerHTML = `
+    <div class="lesson-title">${sub.icon} ${sub.name}</div>
+    ${sub.topics.map(t => {
+      const hasContent = sub.content && sub.content[t.id];
+      const isDone = state.lessonProgress[t.id];
+      return `
+        <div class="card" style="margin-bottom:10px;cursor:pointer;opacity:${hasContent?1:.6}" onclick="${hasContent?`openLesson('${key}','${t.id}')`:''}" >
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:28px;height:28px;border-radius:8px;background:${isDone?'var(--green-dim)':'var(--bg3)'};border:1px solid ${isDone?'var(--green)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:13px;color:${isDone?'var(--green)':'var(--text3)'}">${isDone?'✓':'→'}</div>
+            <div>
+              <div style="font-size:14px;font-weight:600">${t.name}</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">${hasContent?'Concept + Tricks + Examples':'Coming soon'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+function openLesson(subjectKey, topicId){
+  currentTopicId = topicId;
+  const sub = LESSONS[subjectKey];
+  const lesson = sub.content[topicId];
+  if(!lesson) return;
+
+  const content = document.getElementById('lesson-content');
+  content.innerHTML = `
+    <button class="back-btn" onclick="openSubject('${subjectKey}')">← Back to ${sub.name}</button>
+    <div class="lesson-title">${lesson.title}</div>
+    ${lesson.sections.map(s => {
+      if(s.type==='concept') return `<div class="concept-block"><div class="concept-title">${s.title}</div><div class="concept-text">${s.body}</div></div>`;
+      if(s.type==='trick') return `<div class="trick-block"><div class="trick-title">${s.title}</div><div class="trick-text">${s.body}</div></div>`;
+      if(s.type==='example') return `<div class="example-block">${s.body.replace(/\n/g,'<br>')}</div>`;
+      return '';
+    }).join('')}
+    <button class="quiz-btn" onclick="markLessonDone('${subjectKey}','${topicId}')">Mark Complete & Practice ⚡</button>
+  `;
+  document.getElementById('screen-learn').scrollTo(0,0);
+}
+
+function markLessonDone(subjectKey, topicId){
+  state.lessonProgress[topicId] = subjectKey;
+  state.probability = Math.min(85, state.probability + 3);
+  save();
+  showToast('✅ Lesson complete! Probability +3%');
+  showTab('practice');
+}
+
+function closeLessonView(){
+  document.getElementById('topic-grid').style.display = 'grid';
+  document.getElementById('lesson-view').classList.remove('visible');
+  document.getElementById('lesson-content').innerHTML = '';
+  currentSubject = null;
+}
+
+// ═══ PRACTICE ═══
+let activeFilter = 'all';
+let currentQIndex = 0;
+let filteredQs = [];
+let answered = {};
+
+function renderPractice(){
+  const filters = [{k:'all',l:'All'},{k:'quant',l:'Quant'},{k:'english',l:'English'},{k:'reasoning',l:'Reasoning'},{k:'gk',l:'GK'},{k:'easy',l:'Easy'},{k:'medium',l:'Medium'},{k:'hard',l:'Hard'}];
+  document.getElementById('filter-row').innerHTML = filters.map(f =>
+    `<button class="filter-chip ${f.k===activeFilter?'active':''}" onclick="setFilter('${f.k}')">${f.l}</button>`
+  ).join('');
+
+  filteredQs = QUESTIONS.filter(q =>
+    activeFilter==='all' || q.subject===activeFilter || q.diff===activeFilter
+  );
+  currentQIndex = 0;
+  answered = {};
+  renderQuestion();
+}
+
+function setFilter(k){
+  activeFilter = k;
+  renderPractice();
+}
+
+function renderQuestion(){
+  const pa = document.getElementById('practice-area');
+  if(!filteredQs.length){pa.innerHTML='<div class="empty">No questions for this filter</div>';return;}
+  const q = filteredQs[currentQIndex];
+  const isAnswered = answered[q.id] !== undefined;
+  const chosen = answered[q.id];
+
+  pa.innerHTML = `
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q${currentQIndex+1} of ${filteredQs.length}</span>
+        <span class="q-diff diff-${q.diff}">${q.diff}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((o,i) => {
+          let cls = '';
+          if(isAnswered){
+            if(i===q.ans) cls='correct';
+            else if(i===chosen) cls='wrong';
+          } else if(i===chosen) cls='selected';
+          return `<div class="q-opt ${cls}" onclick="${isAnswered?'':'`chooseAnswer('+q.id+','+i+')`'}">${String.fromCharCode(65+i)}. ${o}</div>`;
+        }).join('')}
+      </div>
+      <div class="q-explanation ${isAnswered?'visible':''}" id="q-exp">
+        <strong>${chosen===q.ans?'✅ Correct!':'❌ Wrong!'}</strong> ${q.exp}
+      </div>
+      <div class="q-nav">
+        ${currentQIndex>0?`<button class="q-nav-btn" onclick="prevQ()">← Prev</button>`:''}
+        ${currentQIndex<filteredQs.length-1?`<button class="q-nav-btn primary" onclick="nextQ()">Next →</button>`:`<button class="q-nav-btn primary" onclick="setFilter('all')">Restart ↺</button>`}
+      </div>
+    </div>
+  `;
+}
+
+function chooseAnswer(qId, chosen){
+  const q = QUESTIONS.find(x=>x.id===qId);
+  if(!q || answered[qId]!==undefined) return;
+  answered[qId] = chosen;
+  state.qsSolved += 1;
+  if(chosen === q.ans){
+    state.correct += 1;
+    state.probability = Math.min(85, state.probability + 0.5);
+  }
+  save();
+  renderQuestion();
+  renderHome();
+}
+
+function nextQ(){
+  if(currentQIndex < filteredQs.length-1){ currentQIndex++; renderQuestion(); }
+}
+function prevQ(){
+  if(currentQIndex > 0){ currentQIndex--; renderQuestion(); }
+}
+
+// ═══ PROGRESS ═══
+function renderProgress(){
+  const subjs = [
+    {k:'quant',name:'Quant',color:'#60a5fa'},{k:'english',name:'English',color:'#22c55e'},
+    {k:'reasoning',name:'Reasoning',color:'#a78bfa'},{k:'gk',name:'GK',color:'#f87171'}
+  ];
+  document.getElementById('subj-grid').innerHTML = subjs.map(s => {
+    const p = state.subjectProgress[s.k] || 0;
+    return `
+      <div class="subj-card">
+        <div class="subj-name">${s.name}</div>
+        <div class="subj-score" style="color:${s.color}">${p}%</div>
+        <div class="subj-bar-wrap"><div class="subj-bar"><div class="subj-fill" style="width:${p}%;background:${s.color}"></div></div></div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('roadmap-list').innerHTML = ROADMAP.map((r,i) => `
+    <div class="month-item ${r.status==='current'?'current':''}">
+      <div class="month-dot-wrap">
+        <div class="month-dot ${r.status==='current'?'active-dot':r.status==='done'?'done-dot':''}">${r.status==='done'?'✓':i+1}</div>
+        ${i<ROADMAP.length-1?'<div class="month-line"></div>':''}
+      </div>
+      <div class="month-info">
+        <div class="month-name">${r.m} — ${r.name}</div>
+        <div class="month-sub">${r.desc}</div>
+        <span class="month-tag ${r.status==='current'?'mt-current':r.status==='done'?'mt-done':'mt-upcoming'}">${r.status==='current'?'YOU ARE HERE':r.status==='done'?'Complete':'Upcoming'}</span>
+      </div>
+    </div>
+  `).join('');
+
+  const tip = TIPS[Math.floor(Math.random()*TIPS.length)];
+  document.getElementById('tip-text-content').innerHTML = tip;
+}
+
+// ═══ NAVIGATION ═══
+function showTab(tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.getElementById('nav-'+tab).classList.add('active');
+  document.getElementById('screen-'+tab).scrollTo(0,0);
+
+  if(tab==='home') renderHome();
+  if(tab==='learn'){ renderLearn(); document.getElementById('topic-grid').style.display='grid'; document.getElementById('lesson-view').classList.remove('visible'); }
+  if(tab==='practice') renderPractice();
+  if(tab==='progress') renderProgress();
+}
+
+function showToast(msg, dur=2500){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ═══ PWA INSTALL ═══
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(()=>showToast('📲 Tap ⋮ → Add to Home Screen to install!', 5000), 2000);
+});
+
+// ═══ SERVICE WORKER ═══
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// ═══ CHECK NEW DAY ═══
+(function checkDay(){
+  const last = S.get('lastDate', null);
+  const today = new Date().toDateString();
+  if(last && last !== today){
+    state.day = Math.min(180, state.day + 1);
+    state.tasks = [false,false,false,false,false];
+    state.tasksCompletedToday = false;
+    S.set('lastDate', today);
+    save();
+  } else if(!last){
+    S.set('lastDate', today);
+  }
+})();
+
+// ═══ INIT ═══
+renderHome();
+</script>
+</body>
+</html>
